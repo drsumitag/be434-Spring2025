@@ -6,8 +6,8 @@ import os
 import re
 
 PRG = './revc.py'
-TEST1 = ('./inputs/input1.txt', './tests/inputs/output1.txt')
-TEST2 = ('./inputs/input2.txt', './tests/inputs/output2.txt')
+TEST1 = ('./inputs/input1.txt', './inputs/output1.txt')
+TEST2 = ('./inputs/input2.txt', './inputs/output2.txt')
 
 
 # --------------------------------------------------
