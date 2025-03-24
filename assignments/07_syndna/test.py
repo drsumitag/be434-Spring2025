@@ -6,10 +6,14 @@ import random
 import re
 import string
 from subprocess import getstatusoutput
-from Bio import SeqIO
+
+#from Bio import SeqIO
 #from Bio.SeqUtils import GC
 from Bio.SeqUtils import gc_fraction
-from numpy import mean
+#from numpy import mean
+
+#from Bio.SeqUtils import gc_fraction
+
 from itertools import chain
 
 prg = './syndna.py'
@@ -24,13 +28,11 @@ def random_string():
 
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
-
 # --------------------------------------------------
 def test_exists():
     """usage"""
-
+     
     assert os.path.isfile(prg)
-
 
 # --------------------------------------------------
 def test_usage():
@@ -40,7 +42,6 @@ def test_usage():
         rv, out = getstatusoutput('{} {}'.format(prg, flag))
         assert rv == 0
         assert re.match("usage", out, re.IGNORECASE)
-
 
 # --------------------------------------------------
 def test_bad_seqtype():
@@ -61,7 +62,6 @@ def test_bad_pctgc():
     assert re.match('usage:', out, re.I)
     assert re.search(f'--pctgc "{float(bad)}" must be between 0 and 1', out)
 
-
 # --------------------------------------------------
 def test_defaults():
     """runs on good input"""
@@ -77,24 +77,29 @@ def test_defaults():
         assert os.path.isfile(out_file)
 
         # correct number of seqs
-        seqs = list(SeqIO.parse(out_file, 'fasta'))
-        assert len(seqs) == 10
+        with open(out_file, 'r') as fh:
+            lines = fh.readlines()
+        seq_count = len([line for line in lines if line.startswith('>')])
+        assert seq_count == 10
 
         # the lengths are in the correct range
-        seq_lens = list(map(lambda seq: len(seq.seq), seqs))
+        seq_lens = []
+        sequences = []
+        for line in lines:
+            if not line.startswith('>'):
+                seq_lens.append(len(line.strip()))
+                sequences.append(line.strip())
         assert max(seq_lens) <= 75
         assert min(seq_lens) >= 50
 
         # bases are correct
-        bases = ''.join(
-            sorted(
-                set(chain(map(lambda seq: ''.join(sorted(set(seq.seq))),
-                              seqs)))))
-        assert bases == 'ACGT'
+        bases = set(''.join(sequences))
+        assert bases == set('ACGT')
 
         # the pct GC is about right
-        gc = list(map(lambda seq: GC(seq.seq) / 100, seqs))
-        assert .47 <= mean(gc) <= .53
+        gc = [GC(seq) / 100 for seq in sequences]
+        avg_gc = sum(gc) / len(gc)
+        assert .47 <= avg_gc <= .53
 
     finally:
         if os.path.isfile(out_file):
@@ -122,22 +127,29 @@ def test_options():
         assert os.path.isfile(out_file)
 
         # correct number of seqs
-        seqs = list(SeqIO.parse(out_file, 'fasta'))
-        assert len(seqs) == num_seqs
+        with open(out_file, 'r') as fh:
+            lines = fh.readlines()
+        seq_count = len([line for line in lines if line.startswith('>')])
+        assert seq_count == num_seqs
 
         # the lengths are in the correct range
-        seq_lens = list(map(lambda seq: len(seq.seq), seqs))
+        seq_lens = []
+        sequences = []
+        for line in lines:
+            if not line.startswith('>'):
+                seq_lens.append(len(line.strip()))
+                sequences.append(line.strip())
         assert max(seq_lens) <= max_len
         assert min(seq_lens) >= min_len
 
         # bases are correct
-        bases = set(''.join(
-            map(lambda seq: ''.join(sorted(set(seq.seq))), seqs)))
+        bases = set(''.join(sequences))
         assert bases == set('ACGU')
 
         # the pct GC is about right
-        gc = list(map(lambda seq: GC(seq.seq) / 100, seqs))
-        assert pct_gc - .3 <= mean(gc) <= pct_gc + .3
+        gc = [GC(seq) / 100 for seq in sequences]
+        avg_gc = sum(gc) / len(gc)
+        assert pct_gc - .3 <= avg_gc <= pct_gc + .3
 
     finally:
         if os.path.isfile(out_file):
