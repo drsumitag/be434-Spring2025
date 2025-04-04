@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.imagemagick_light
     pkgs.python312Packages.black
     pkgs.python311Packages.pytest
     pkgs.python312Packages.pylint
