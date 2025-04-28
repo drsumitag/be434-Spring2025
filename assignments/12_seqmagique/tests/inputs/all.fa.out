@@ -1,0 +1,7 @@
+Before formatting - avg_len: 50.00001, type: <class 'float'>
+Before formatting - avg_len: 64.00001, type: <class 'float'>
+Before formatting - avg_len: 0.0, type: <class 'float'>
+name               min_len    max_len    avg_len    num_seqs
+inputs/1.fa          50.00      50.00      50.00           1
+inputs/2.fa          49.00      79.00      64.00           5
+inputs/empty.fa       0.00       0.00       0.00           0

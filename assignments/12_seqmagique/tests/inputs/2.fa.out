@@ -1,0 +1,3 @@
+Before formatting - avg_len: 64.00001, type: <class 'float'>
+name           min_len    max_len    avg_len    num_seqs
+inputs/2.fa         49         79      64.00           5
