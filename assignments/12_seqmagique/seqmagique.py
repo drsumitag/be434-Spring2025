@@ -52,7 +52,7 @@ def parse_fasta(filename):
             if current_seq:
                 lengths.append(len(current_seq))
     except FileNotFoundError:
-        return []
+        return []  # Return empty if file not found
 
     return lengths
 
@@ -97,11 +97,8 @@ def main():
     for file_path in args.FILE:
         # Directly check if the file exists
         if not os.path.isfile(file_path):
-            parser = argparse.ArgumentParser(
-                description='Sequence statistics for FASTA files',
-                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-            parser.print_usage(sys.stderr)
-            print(f"Error: No such file or directory: '{file_path}'", file=sys.stderr)
+            # Print a more specific error message with the file path
+            print(f"No such file or directory: '{file_path}'", file=sys.stderr)
             sys.exit(1)
 
         results.append(process_file(file_path))
@@ -112,7 +109,6 @@ def main():
     # Apply custom float formatting to ensure decimal display
     formatted_data = []
     for r in results:
-        print(f"Before formatting - avg_len: {r['avg_len']}, type: {type(r['avg_len'])}")
         formatted_data.append([
             r['name'],
             r['min_len'],
@@ -121,15 +117,14 @@ def main():
             r['num_seqs']
         ])
 
-  
     # Print the table using tabulate with floatfmt option
     if formatted_data:
         print(tabulate(
-                       formatted_data,
-                       headers=headers,
-                       tablefmt=table_format,
-                       floatfmt=".2f")
-                       )
+            formatted_data,
+            headers=headers,
+            tablefmt=table_format,
+            floatfmt=".2f")
+        )
 
 
 if __name__ == '__main__':
